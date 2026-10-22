@@ -74,6 +74,12 @@ Seeds are `42, 43, 44, 45, 46`. The 20 formal training runs each request 300,000
 
 The repository includes a [machine-readable statistical summary](docs/results/metrics.json), [raw curve data](docs/results/curves.json), and [result file notes](docs/results/README.md). The full statistical procedure is documented in [MULTISEED.md](ibe_map/MULTISEED.md). The notes and detailed protocol are currently in Chinese. Large trajectory files, models, and observation caches are excluded from Git and can be regenerated using the workflow below.
 
+## End-to-end ResNet50 comparison
+
+The current reference is **seed-42 MAP only**, with 300,000 episodes and a matched BF16 frozen MAP control. At the user's request, all other nine end-to-end jobs, including SAM+GRU, were cancelled; completed frozen runs are retained. See the [current workflow](e2e_map/CURRENT.md) and [verified MAP reference](docs/e2e_map_reference/README.md). This single-seed result cannot establish stable improvement or determine the effect on SAM+GRU. The [original full protocol](e2e_map/README.md) is preserved separately.
+
+The completed E2E run reached 300,005 episodes with no AMP-skipped updates. Compared with its matched frozen control, simple accuracy was 95.00% versus 91.06%, and hard accuracy was 91.99% versus 90.02%. Hard discounted return rose from 0.3253 to 0.3562, while distance rose slightly from 11.96 m to 12.16 m. All 211,750 evaluation trajectories passed independent verification. [Execution optimizations and short GPU tests](e2e_map/PERFORMANCE.md) are recorded separately from these policy results.
+
 ## Installation
 
 Python 3.12 and an NVIDIA CUDA environment compatible with your PyTorch installation are recommended. Use a GPU for full SAM preprocessing and the five-seed experiments. Dependency files specify minimum versions rather than a cross-platform lockfile; the original experiments used Python 3.12 and PyTorch `2.14.0+cu130`. Fixed seeds do not guarantee identical results across hardware.
@@ -212,8 +218,10 @@ Caches and checkpoints validate the classifier, encoder, SAM, data location, pre
 demo/                         Classifier and historical heuristic demo
 map_baseline/                 Discrete environment, MAP, feature caches, and tests
 ibe_map/                      SAM, GRU, ablations, multiseed experiments, and verification
+e2e_map/                      Trainable ResNet50, matched BF16 controls, and audited comparison
 third_party/segment_anything/ Pinned SAM model source, provenance, and license
 docs/results/                 Published statistics and curves
+docs/e2e_map_reference/       Verified single-seed MAP reference and short performance tests
 requirements-*.txt            Dependencies for each experiment stage
 run_*.ps1                     Windows experiment runners
 README.md                     English documentation (default)
@@ -224,7 +232,7 @@ README-DEMO.md                Historical demo notes
 ## Reproduction scope and limitations
 
 - **SAM is not fine-tuned:** the available dataset copy lacks pixel-level target segmentation annotations, and the authors' fine-tuned weights were not available. The project uses official pretrained ViT-B and does not report segmentation accuracy against ground truth masks.
-- **Visual backbones are frozen:** policies use a frozen ResNet50 and a shared, previously trained ResNet18 classifier, rather than end-to-end visual encoder training.
+- **Backbone training is reported separately:** the historical results above use frozen ResNet50 features. The end-to-end comparison trains ResNet50 while keeping pretrained BatchNorm running statistics fixed. Both experiments share the same frozen ResNet18 recognition outputs.
 - **Target boxes are given:** dataset ground truth bounding boxes replace online detection and tracking.
 - **Motion is offline and discrete:** the environment does not simulate flight dynamics, collisions, energy consumption, or localization errors. Path length is the Euclidean distance of grid movements.
 - **Some details are implementation choices:** Q-branch composition, SAM surrounding-point sampling, and cached randomization are explicitly documented local choices and are not claimed to match the authors' unpublished implementation exactly.

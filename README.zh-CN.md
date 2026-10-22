@@ -76,6 +76,12 @@ IBE-MAP 的平均准确率在四种学习策略中最高，整体最高准确率
 
 仓库附带 [机器可读统计摘要](docs/results/metrics.json)、[原始曲线数据](docs/results/curves.json) 和 [结果文件说明](docs/results/README.md)。完整统计方法见 [MULTISEED.md](ibe_map/MULTISEED.md)。大体积逐步轨迹、模型和观察缓存不随 Git 仓库发布，可按下述流程重新生成。
 
+## ResNet50 端到端训练对照
+
+按用户最新要求，当前只完成 **seed 42 的 MAP 端到端训练**，预算 30 万回合，与相同种子的 BF16 冻结 MAP 比较。包括 SAM+GRU 在内的另外九次端到端训练均已取消，已完成的冻结训练保留。详见[当前流程](e2e_map/CURRENT.md)和[核验后的 MAP 参考结果](docs/e2e_map_reference/README.md)。这是单种子 MAP 参考，不能判断稳定改善或 SAM+GRU 的变化；[原五种子方案](e2e_map/README.md)另行保留。
+
+当前训练已完成 300,005 回合，AMP 跳过 0 次。与匹配冻结对照相比，simple 准确率为 95.00% 对 91.06%，hard 为 91.99% 对 90.02%；hard 折扣回报从 0.3253 升至 0.3562，距离从 11.96 m 略增至 12.16 m。全部 211,750 条评估轨迹通过独立核验。[训练计算优化及 GPU 短测](e2e_map/PERFORMANCE.md)单独记录，不混入上述识别结果。
+
 ## 安装
 
 建议使用 Python 3.12 和支持当前 PyTorch 版本的 NVIDIA CUDA 环境。完整 SAM 预处理和五种子实验建议在 GPU 上运行。依赖文件声明最低版本，不是跨平台锁定环境；原实验使用 Python 3.12、PyTorch `2.14.0+cu130`。固定种子不保证跨硬件逐位相同。
@@ -214,8 +220,10 @@ python demo/run_demo.py
 demo/                         分类器与历史规则演示
 map_baseline/                 离散环境、MAP、特征缓存及测试
 ibe_map/                      SAM、GRU、消融、多种子实验与核验
+e2e_map/                      ResNet50 端到端训练、BF16 匹配冻结对照与核验汇总
 third_party/segment_anything/ 固定版本 SAM 模型源码、来源与许可证
 docs/results/                 发布的统计摘要与曲线
+docs/e2e_map_reference/       核验后的单种子 MAP 参考与短性能测试
 requirements-*.txt            分阶段 Python 依赖
 run_*.ps1                     Windows 调度脚本
 README.md                     英文版项目说明（默认）
@@ -226,7 +234,7 @@ README-DEMO.md                原始演示阶段运行记录
 ## 复现范围与限制
 
 - **SAM 未微调**：当前数据副本未包含像素级目标分割标注，未获得作者微调权重；使用官方预训练 ViT-B，不报告对真实分割标注的准确率。
-- **视觉主干冻结**：策略使用冻结的 ResNet50 与共享的已训练 ResNet18，不是端到端视觉编码器训练。
+- **主干训练单独对比**：上文历史结果使用冻结 ResNet50；新增端到端实验训练 ResNet50 参数并固定预训练 BatchNorm 运行统计量。两组共享相同的冻结 ResNet18 识别结果。
 - **已知目标框**：使用数据集 GT bbox，不包含在线检测器或跟踪器。
 - **离线离散运动**：不模拟真实飞行动力学、碰撞、能耗或定位误差，路径指标为网格欧氏移动距离。
 - **实现选择**：Q 分支合成、SAM 周围点采样和缓存随机化等细节为文档化的本地选择，不代表与作者未公开实现精确对齐。

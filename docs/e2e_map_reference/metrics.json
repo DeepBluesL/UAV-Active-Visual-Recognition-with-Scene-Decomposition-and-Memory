@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "status": "complete_single_seed_map_reference",
+  "scope": "seed-42 MAP only; no E2E IBE-MAP/SAM+GRU training or evaluation",
+  "seed": 42,
+  "requested_training_episodes": 300000,
+  "hard_evaluation_episodes_per_group": 15125,
+  "verified_trajectories_each_run": 105875,
+  "verified_trajectories_total": 211750,
+  "groups": {
+    "train": {
+      "e2e_map": {
+        "episodes": 60500,
+        "accuracy": 0.9920495867768595,
+        "return_mean": 0.4189484558471224,
+        "distance_m": 10.099834710743801,
+        "decisions": 1.3619834710743801,
+        "success_rate": 0.9920495867768595,
+        "stop_rate": 0.9996363636363637,
+        "budget_end_rate": 0.0003636363636363636
+      },
+      "frozen_bf16_map": {
+        "episodes": 60500,
+        "accuracy": 0.9781818181818182,
+        "return_mean": 0.3994757069602978,
+        "distance_m": 11.123636363636363,
+        "decisions": 1.3927768595041323,
+        "success_rate": 0.9781818181818182,
+        "stop_rate": 0.9985785123966943,
+        "budget_end_rate": 0.001421487603305785
+      },
+      "e2e_minus_frozen": {
+        "accuracy": 0.013867768595041352,
+        "return_mean": 0.019472748886824598,
+        "distance_m": -1.023801652892562,
+        "decisions": -0.03079338842975221,
+        "success_rate": 0.013867768595041352,
+        "stop_rate": 0.001057851239669394,
+        "budget_end_rate": -0.0010578512396694213
+      }
+    },
+    "simple": {
+      "e2e_map": {
+        "episodes": 15125,
+        "accuracy": 0.9499504132231404,
+        "return_mean": 0.36491645982492066,
+        "distance_m": 12.252561983471074,
+        "decisions": 1.4452231404958678,
+        "success_rate": 0.9499504132231404,
+        "stop_rate": 0.9937190082644628,
+        "budget_end_rate": 0.00628099173553719
+      },
+      "frozen_bf16_map": {
+        "episodes": 15125,
+        "accuracy": 0.9106115702479339,
+        "return_mean": 0.32191841806163474,
+        "distance_m": 13.272727272727273,
+        "decisions": 1.469289256198347,
+        "success_rate": 0.9106115702479339,
+        "stop_rate": 0.9913388429752066,
+        "budget_end_rate": 0.008661157024793389
+      },
+      "e2e_minus_frozen": {
+        "accuracy": 0.03933884297520651,
+        "return_mean": 0.04299804176328592,
+        "distance_m": -1.0201652892561999,
+        "decisions": -0.024066115702479296,
+        "success_rate": 0.03933884297520651,
+        "stop_rate": 0.0023801652892562197,
+        "budget_end_rate": -0.002380165289256199
+      }
+    },
+    "hard": {
+      "e2e_map": {
+        "episodes": 15125,
+        "accuracy": 0.9199338842975207,
+        "return_mean": 0.3562025781594032,
+        "distance_m": 12.158677685950414,
+        "decisions": 1.3430082644628099,
+        "success_rate": 0.9199338842975207,
+        "stop_rate": 0.9809586776859505,
+        "budget_end_rate": 0.019041322314049588
+      },
+      "frozen_bf16_map": {
+        "episodes": 15125,
+        "accuracy": 0.9002314049586777,
+        "return_mean": 0.32533364945403803,
+        "distance_m": 11.958347107438016,
+        "decisions": 1.429289256198347,
+        "success_rate": 0.9002314049586777,
+        "stop_rate": 0.9819504132231405,
+        "budget_end_rate": 0.018049586776859503
+      },
+      "e2e_minus_frozen": {
+        "accuracy": 0.01970247933884295,
+        "return_mean": 0.030868928705365173,
+        "distance_m": 0.2003305785123981,
+        "decisions": -0.08628099173553716,
+        "success_rate": 0.01970247933884295,
+        "stop_rate": -0.0009917355371900083,
+        "budget_end_rate": 0.0009917355371900846
+      }
+    },
+    "hard_fixed_3_moves": {
+      "e2e_map": {
+        "episodes": 15125,
+        "accuracy": 0.9509421487603306,
+        "return_mean": -0.01931161673798049,
+        "distance_m": 42.17123966942149,
+        "decisions": 4.0,
+        "success_rate": 0.9509421487603306,
+        "stop_rate": 1.0,
+        "budget_end_rate": 0.0
+      },
+      "frozen_bf16_map": {
+        "episodes": 15125,
+        "accuracy": 0.9055206611570248,
+        "return_mean": -0.048010867475478114,
+        "distance_m": 39.90280991735537,
+        "decisions": 4.0,
+        "success_rate": 0.9055206611570248,
+        "stop_rate": 1.0,
+        "budget_end_rate": 0.0
+      },
+      "e2e_minus_frozen": {
+        "accuracy": 0.04542148760330578,
+        "return_mean": 0.028699250737497625,
+        "distance_m": 2.268429752066119,
+        "decisions": 0.0,
+        "success_rate": 0.04542148760330578,
+        "stop_rate": 0.0,
+        "budget_end_rate": 0.0
+      }
+    }
+  },
+  "uncertainty": null,
+  "statistical_claims": null,
+  "sam_gru_conclusion": "Not evaluated; these MAP-only results cannot determine whether SAM+GRU improves with end-to-end encoder training.",
+  "training_runs": [
+    {
+      "regime": "e2e_map",
+      "seed": 42,
+      "requested_episodes": 300000,
+      "completed_episodes": 300005,
+      "updates": 10662,
+      "elapsed_seconds": 2700.3056725999995,
+      "checkpoint_sha256": "d96a5c1373bb6be8f0ae797ab1306c4392b79baf4c9fb64b00898d0df6ad1def",
+      "training_json_sha256": "2ca6242449d4bf1f6260e936464969540479bc43f71f3672f8e0975d5134f275",
+      "config_sha256": "4a1facf4728c81ea10a18848e8dfb980b43f9331c96e98382fe1c130c7c91eaf"
+    },
+    {
+      "regime": "frozen_bf16_map",
+      "seed": 42,
+      "requested_episodes": 300000,
+      "completed_episodes": 300033,
+      "updates": 11008,
+      "elapsed_seconds": 51.212054600000556,
+      "checkpoint_sha256": "0c97e699b5bfe9918aeaa241a75c8eae3f94e71ffc3107a02e7eff25494ffe5f",
+      "training_json_sha256": "3f80afa372e70ef804f877facabf3bdf17e0130c1bef70cdb260f0960b40c516",
+      "config_sha256": "0f27016083da0734b127227ea4fd37fa5f35c3e2a3e496cc3f930f08063b2baf"
+    }
+  ],
+  "verification": {
+    "e2e_map": {
+      "passed": true,
+      "counts": {
+        "metrics_groups": 4,
+        "trajectories": 105875,
+        "csv_rows": 105875,
+        "unique_episode_keys": 105875,
+        "raw_scenes_loaded": 150
+      },
+      "verification_sha256": "afa4a54b0ad33a1ac894836f088d38ea95a1835139f0e23ef18638e13823b06e"
+    },
+    "frozen_bf16_map": {
+      "passed": true,
+      "counts": {
+        "metrics_groups": 4,
+        "trajectories": 105875,
+        "csv_rows": 105875,
+        "unique_episode_keys": 105875,
+        "raw_scenes_loaded": 150
+      },
+      "verification_sha256": "93675994670a5eea587ba569f9abbff12393bf8434bad5d6e66a69d177c9515e"
+    }
+  },
+  "source_lock": {
+    "original_run_manifest_sha256": "73487598c378d02f2cdf6ebeb99754e692b6e0508a1dc3e2bad43660f264e26d",
+    "original_training_source_sha256": {
+      "e2e_map/experiment.py": "ab9d32d13d610d820dcd654ffb975b502c8aef7acc362a73f62b832b0598ed05",
+      "e2e_map/model.py": "55c44aebf7d2eaad26de8ad4f3e1e4a38f1c3e89fd3dab5d74afa2a1694329e6",
+      "e2e_map/images.py": "cd4b41a0f9377c177a06717d714e81897770cfc7214deb06d0b54dc01424f235",
+      "e2e_map/control.py": "0e9c41c76d08e4dc44fa08e142bc499f82d994aecd9a851ab7046041c119ad66",
+      "map_baseline/environment.py": "aa7eafda047e33ece076ddf8de8cdaf4398d33330a482252a053d59e128fc0d3",
+      "map_baseline/model.py": "75e8909fd937e5114b0f8e08618964c5a71ae911e97c9924eb79ad1ea8bceca0",
+      "map_baseline/experiment.py": "cb30dba1f0afe2b9c96854bf139d7ca4f78c9fa0bdfdaee85831afa65abfaf3b",
+      "map_baseline/features.py": "6993e422905343c889946acdbc73a23eba2118c22648de442259e534e91bcede",
+      "map_baseline/checkpoints.py": "3c92fab88db846e93d958aa841bc97d39dc080166ab08227078396332d29d5c6",
+      "ibe_map/model.py": "ef208f47792aab71d90367d7cd80adb170582cb8d11a2f66eae2065adc23129d",
+      "ibe_map/experiment.py": "88656d3da1fd7fbb594639eaf00a54ca14437ad6cd47d86df140f17d3c547085"
+    },
+    "evaluation_source_sha256": {
+      "e2e_map/finish_current.py": "2e34f7d1adeffe2cb491c0f034c34e12cfba655d12a2d742b6633249068c5fdc",
+      "e2e_map/experiment.py": "ab9d32d13d610d820dcd654ffb975b502c8aef7acc362a73f62b832b0598ed05",
+      "e2e_map/model.py": "55c44aebf7d2eaad26de8ad4f3e1e4a38f1c3e89fd3dab5d74afa2a1694329e6",
+      "e2e_map/images.py": "cd4b41a0f9377c177a06717d714e81897770cfc7214deb06d0b54dc01424f235",
+      "e2e_map/evaluate.py": "e3c3e57b1e185a021564b98970926bbe3c1c9a7bd243878c66efc442635a2f4f",
+      "e2e_map/control.py": "0e9c41c76d08e4dc44fa08e142bc499f82d994aecd9a851ab7046041c119ad66",
+      "map_baseline/environment.py": "aa7eafda047e33ece076ddf8de8cdaf4398d33330a482252a053d59e128fc0d3",
+      "map_baseline/model.py": "75e8909fd937e5114b0f8e08618964c5a71ae911e97c9924eb79ad1ea8bceca0",
+      "map_baseline/experiment.py": "cb30dba1f0afe2b9c96854bf139d7ca4f78c9fa0bdfdaee85831afa65abfaf3b",
+      "map_baseline/features.py": "6993e422905343c889946acdbc73a23eba2118c22648de442259e534e91bcede",
+      "map_baseline/checkpoints.py": "3c92fab88db846e93d958aa841bc97d39dc080166ab08227078396332d29d5c6",
+      "ibe_map/model.py": "ef208f47792aab71d90367d7cd80adb170582cb8d11a2f66eae2065adc23129d",
+      "ibe_map/experiment.py": "88656d3da1fd7fbb594639eaf00a54ca14437ad6cd47d86df140f17d3c547085",
+      "ibe_map/verify_results.py": "03936586733ce34c18cc15d667820fe3e6da0cb9e89d9dcae5da52effae08f5a",
+      "e2e_map/report.py": "6aa41b41878164d3501cf77c2f38ed2298be3e3b7d55331eded16e1e5a889f47",
+      "e2e_map/pipeline.py": "2de3262fb13ccab88d81024f195e461b088aec9954726649e13967cbd36d6256",
+      "ibe_map/multiseed.py": "1d21aa36c1603fffef09357569ef049485cf5e1a9b35fb48b17cfb03bba334ee",
+      "e2e_map/test_finish_current.py": "299326c6440274b10da6f1cd7632500f4755d84428cb574dd5bb2e1aad38bc25"
+    },
+    "e2e_training_json_sha256": "2ca6242449d4bf1f6260e936464969540479bc43f71f3672f8e0975d5134f275",
+    "e2e_checkpoint_sha256": "d96a5c1373bb6be8f0ae797ab1306c4392b79baf4c9fb64b00898d0df6ad1def",
+    "frozen_training_json_sha256": "3f80afa372e70ef804f877facabf3bdf17e0130c1bef70cdb260f0960b40c516",
+    "frozen_checkpoint_sha256": "0c97e699b5bfe9918aeaa241a75c8eae3f94e71ffc3107a02e7eff25494ffe5f",
+    "frozen_control_cache_manifest_sha256": "a05429f5cc56eee27ca84e57ddd380490f675a1358e9cb09047d6bd43c9a2eaf",
+    "frozen_encoder_weights_sha256": "0676ba61b6795bbe1773cffd859882e5e297624d384b6993f7c9e683e722fb8a"
+  },
+  "limitations": [
+    "One E2E MAP seed only: no across-seed standard deviation, confidence interval, or significance claim.",
+    "No E2E IBE-MAP/SAM+GRU run was completed; this report cannot answer whether SAM+GRU benefits from end-to-end training.",
+    "The primary same-seed comparison changes the ResNet50 training regime; it does not isolate SAM or GRU.",
+    "SAM remains at official pretrained weights and is not fine-tuned on UEVAVD."
+  ]
+}
