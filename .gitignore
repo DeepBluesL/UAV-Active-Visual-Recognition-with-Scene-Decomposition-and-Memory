@@ -1,0 +1,32 @@
+# Local datasets, generated models, caches and reports
+/dataset/
+/output/
+/tmp/
+*.pdf
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.npy
+*.part
+
+# Python environments and generated files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+
+# Local settings and credentials
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.agents/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

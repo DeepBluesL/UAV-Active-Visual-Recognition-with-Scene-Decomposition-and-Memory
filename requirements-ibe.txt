@@ -1,0 +1,3 @@
+-r requirements-map.txt
+# SAM's pinned torch-only modeling code is fetched by ibe_map/bootstrap_sam.py.
+# No torchvision, transformers, or segment-anything pip installation is needed.

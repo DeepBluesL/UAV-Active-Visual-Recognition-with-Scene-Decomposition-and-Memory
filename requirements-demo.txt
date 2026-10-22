@@ -1,0 +1,5 @@
+# Existing tested environment: D:\anaconda3\envs\uav\python.exe
+# Python 3.12, torch 2.14.0+cu130; torchvision is not needed.
+torch>=2.6
+numpy>=1.24
+Pillow>=10

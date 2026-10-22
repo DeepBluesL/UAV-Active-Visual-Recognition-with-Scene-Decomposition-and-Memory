@@ -1,0 +1,7 @@
+# Preserve the LF bytes used by experiment source hashes on every platform.
+* text=auto eol=lf
+*.png binary
+*.gif binary
+# Keep published source-manifest and exported-curve checksums byte-exact.
+third_party/** -text
+docs/results/curves.json -text
