@@ -74,6 +74,16 @@ Seeds are `42, 43, 44, 45, 46`. The 20 formal training runs each request 300,000
 
 The repository includes a [machine-readable statistical summary](docs/results/metrics.json), [raw curve data](docs/results/curves.json), and [result file notes](docs/results/README.md). The full statistical procedure is documented in [MULTISEED.md](ibe_map/MULTISEED.md). The notes and detailed protocol are currently in Chinese. Large trajectory files, models, and observation caches are excluded from Git and can be regenerated using the workflow below.
 
+## Budgeted observation value and evidence gating
+
+A new supervised stage learns **when another observation is worth its movement cost** and whether to **retain, replace, or fuse** visual evidence. Development uses 90 training scenes and a separate 10-scene internal validation set; frozen choices are followed by full 100-scene retraining across five seeds. All comparisons enforce the same 0/10/20/40/60 m distance caps and also report actual distance.
+
+On the hard benchmark with a **40 m cap**, gain-based movement with final-view recognition achieves **90.70%** at **14.51 m** average travel. A learned evidence gate on the **exact same paths** achieves **91.84%**. The joint gain-and-gate controller achieves **91.66%** at **12.35 m**. At a 60 m cap, the corresponding gated readouts reach **93.72%** and **93.58%**, with mean travel **17.77 m** and **14.93 m**. These are fixed-scene five-seed means, not equal-realized-distance claims.
+
+The experiment independently verifies **4,537,500 episodes** across 300 rollout artifacts, including budget constraints and all per-step gate choices. See the [method and runnable workflow](active_evidence/README.md), [predeclared protocol](active_evidence/PROTOCOL.md), [results and paired statistics](docs/active_evidence/report.md), and [earlier evidence-fusion diagnostic](diagnostics/README.md). Run `python -m active_evidence.experiment` followed by `python -m active_evidence.verify` and `python -m active_evidence.report`, or use `run_active_evidence.ps1`.
+
+The method predicts one-step benefit, uses frozen upstream models and GT boxes, and changes the learning objective relative to the historical RL reference. The simple/hard benchmarks were previously inspected during exploratory diagnosis; these results do not establish untouched-scene generalization or state-of-the-art performance.
+
 ## End-to-end ResNet50 comparison
 
 The current reference is **seed-42 MAP only**, with 300,000 episodes and a matched BF16 frozen MAP control. At the user's request, all other nine end-to-end jobs, including SAM+GRU, were cancelled; completed frozen runs are retained. See the [current workflow](e2e_map/CURRENT.md) and [verified MAP reference](docs/e2e_map_reference/README.md). This single-seed result cannot establish stable improvement or determine the effect on SAM+GRU. The [original full protocol](e2e_map/README.md) is preserved separately.

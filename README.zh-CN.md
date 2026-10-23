@@ -76,6 +76,16 @@ IBE-MAP 的平均准确率在四种学习策略中最高，整体最高准确率
 
 仓库附带 [机器可读统计摘要](docs/results/metrics.json)、[原始曲线数据](docs/results/curves.json) 和 [结果文件说明](docs/results/README.md)。完整统计方法见 [MULTISEED.md](ibe_map/MULTISEED.md)。大体积逐步轨迹、模型和观察缓存不随 Git 仓库发布，可按下述流程重新生成。
 
+## 预算约束下的观察收益预测与证据门控
+
+新增方法学习**继续观察是否值得移动成本**，并选择**保留、替换或融合**已有视觉证据。先在 90 个训练场景学习，用另外 10 个训练场景选择成本系数；冻结选择后，在全部 100 个训练场景上进行五种子正式训练。共同距离上限为 0/10/20/40/60 m，同时报告实际移动距离。
+
+hard 测试 **40 m 上限**下，收益预测策略配合最终帧识别达到 **90.70%**，平均移动 **14.51 m**；在**完全相同的轨迹**上改用学习门控，达到 **91.84%**。门控参与行动决策的联合版本为 **91.66%**、**12.35 m**。60 m 上限下，两种门控读出分别达到 **93.72% / 17.77 m** 和 **93.58% / 14.93 m**。这些是固定场景上的五种子均值，共同上限不代表实际距离相同。
+
+已独立核验 300 份轨迹文件、**4,537,500 回合**，包括预算、动作和逐步门控选择。详见[方法与运行说明](active_evidence/README.md)、[预先固定的实验协议](active_evidence/PROTOCOL.md)、[结果及配对统计](docs/active_evidence/report.md)和[此前的融合诊断](diagnostics/README.md)。入口为 `run_active_evidence.ps1`，或依次运行 `python -m active_evidence.experiment`、`python -m active_evidence.verify`、`python -m active_evidence.report`。
+
+该方法只预测一步收益，仍使用冻结上游模型和 GT bbox；与历史 RL 参考相比，训练目标也发生变化。simple/hard 曾用于探索诊断，因此不能宣称这是未接触场景上的确认性实验或 SOTA 结果。
+
 ## ResNet50 端到端训练对照
 
 按用户最新要求，当前只完成 **seed 42 的 MAP 端到端训练**，预算 30 万回合，与相同种子的 BF16 冻结 MAP 比较。包括 SAM+GRU 在内的另外九次端到端训练均已取消，已完成的冻结训练保留。详见[当前流程](e2e_map/CURRENT.md)和[核验后的 MAP 参考结果](docs/e2e_map_reference/README.md)。这是单种子 MAP 参考，不能判断稳定改善或 SAM+GRU 的变化；[原五种子方案](e2e_map/README.md)另行保留。
