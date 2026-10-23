@@ -84,6 +84,8 @@ The experiment independently verifies **4,537,500 episodes** across 300 rollout 
 
 The method predicts one-step benefit, uses frozen upstream models and GT boxes, and changes the learning objective relative to the historical RL reference. The simple/hard benchmarks were previously inspected during exploratory diagnosis; these results do not establish untouched-scene generalization or state-of-the-art performance.
 
+Follow-up ablations reuse the 90/10/100 scene protocol and seeds 42–46; full-feature controls exactly reproduce the original checkpoints. On matched hard-40 m trajectories, the three-way gate improves over the binary gate by 0.037 pp (95% CI [−0.016, +0.090]), which does not establish that fusion is necessary. See the [ablation findings](docs/active_evidence_ablations/FINDINGS.md) and [report](docs/active_evidence_ablations/report.md); run `run_active_evidence_ablations.ps1`. The no-embedding condition retains frozen classifier probabilities, bbox and position.
+
 ## End-to-end ResNet50 comparison
 
 The current reference is **seed-42 MAP only**, with 300,000 episodes and a matched BF16 frozen MAP control. At the user's request, all other nine end-to-end jobs, including SAM+GRU, were cancelled; completed frozen runs are retained. See the [current workflow](e2e_map/CURRENT.md) and [verified MAP reference](docs/e2e_map_reference/README.md). This single-seed result cannot establish stable improvement or determine the effect on SAM+GRU. The [original full protocol](e2e_map/README.md) is preserved separately.

@@ -86,6 +86,8 @@ hard 测试 **40 m 上限**下，收益预测策略配合最终帧识别达到 *
 
 该方法只预测一步收益，仍使用冻结上游模型和 GT bbox；与历史 RL 参考相比，训练目标也发生变化。simple/hard 曾用于探索诊断，因此不能宣称这是未接触场景上的确认性实验或 SOTA 结果。
 
+后续消融沿用 90/10/100 场景划分和种子 42–46，完整特征控制精确复现了原检查点。在相同 hard 40 m 轨迹上，三路门控相对二路门控仅提高 0.037 个百分点（95% CI [−0.016, +0.090]），尚无充分证据说明融合是必要的。详见[消融结论](docs/active_evidence_ablations/FINDINGS.md)与[报告](docs/active_evidence_ablations/report.md)，运行入口为 `run_active_evidence_ablations.ps1`。去额外 embedding 条件仍保留冻结分类器概率、bbox 和位置。
+
 ## ResNet50 端到端训练对照
 
 按用户最新要求，当前只完成 **seed 42 的 MAP 端到端训练**，预算 30 万回合，与相同种子的 BF16 冻结 MAP 比较。包括 SAM+GRU 在内的另外九次端到端训练均已取消，已完成的冻结训练保留。详见[当前流程](e2e_map/CURRENT.md)和[核验后的 MAP 参考结果](docs/e2e_map_reference/README.md)。这是单种子 MAP 参考，不能判断稳定改善或 SAM+GRU 的变化；[原五种子方案](e2e_map/README.md)另行保留。
