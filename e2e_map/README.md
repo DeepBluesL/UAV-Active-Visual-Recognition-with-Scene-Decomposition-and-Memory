@@ -1,6 +1,6 @@
 # End-to-end ResNet50 policy training
 
-**Current execution:** reduced at the user's request to **seed-42 MAP only**, followed by a short throughput/memory optimization test. See [CURRENT.md](CURRENT.md). The five-seed design below is retained as the original full experiment plan, not a claim of completed results.
+**Current execution:** the seed-42 MAP reference and performance test are complete. On 2026-10-24, the user requested a small GRU continuation: one seed of E2E SAM+GRU and a matched frozen control, 5,000 episodes each. See [GRU_QUICK.md](GRU_QUICK.md) and the previous [MAP record](CURRENT.md). The five-seed design below is retained as the original full experiment plan, not a claim of completed results.
 
 This stage compares **MAP and IBE-MAP (SAM+GRU)** with a trainable ResNet50 against newly matched BF16 frozen-backbone five-seed controls. The existing FP16 frozen results remain a separate historical reference. It is an independent experiment based on the [UEVAVD paper](https://arxiv.org/html/2411.04348v1), which identifies an ImageNet-pretrained ResNet50 but does not specify its freezing or BatchNorm policy. End-to-end training therefore fills a documented implementation gap; it is not proof of an exact author implementation.
 

@@ -88,9 +88,11 @@ Follow-up ablations reuse the 90/10/100 scene protocol and seeds 42–46; full-f
 
 ## End-to-end ResNet50 comparison
 
-The current reference is **seed-42 MAP only**, with 300,000 episodes and a matched BF16 frozen MAP control. At the user's request, all other nine end-to-end jobs, including SAM+GRU, were cancelled; completed frozen runs are retained. See the [current workflow](e2e_map/CURRENT.md) and [verified MAP reference](docs/e2e_map_reference/README.md). This single-seed result cannot establish stable improvement or determine the effect on SAM+GRU. The [original full protocol](e2e_map/README.md) is preserved separately.
+The completed 300,000-episode reference is **seed-42 MAP**, with a matched BF16 frozen MAP control. At the user's request, all other nine full end-to-end jobs, including SAM+GRU, were cancelled; completed frozen runs are retained. See the [MAP completion record](e2e_map/CURRENT.md) and [verified MAP reference](docs/e2e_map_reference/README.md). This single-seed MAP result cannot establish stable improvement or determine the effect on SAM+GRU. The [original full protocol](e2e_map/README.md) is preserved separately.
 
 The completed E2E run reached 300,005 episodes with no AMP-skipped updates. Compared with its matched frozen control, simple accuracy was 95.00% versus 91.06%, and hard accuracy was 91.99% versus 90.02%. Hard discounted return rose from 0.3253 to 0.3562, while distance rose slightly from 11.96 m to 12.16 m. All 211,750 evaluation trajectories passed independent verification. [Execution optimizations and short GPU tests](e2e_map/PERFORMANCE.md) are recorded separately from these policy results.
+
+A [small SAM+GRU continuation](e2e_map/GRU_QUICK.md) completed on 2026-10-24 uses seed 42 and 5,000 episodes per arm. E2E versus matched frozen hard accuracy is **87.54% versus 85.42%**, return **0.2849 versus 0.2691**, and distance **12.58 versus 13.55 m**. Simple accuracy is lower (**84.46% versus 86.45%**), so improvement is mixed. GRU parameter-update checks and **90,750 trajectories** passed verification. The compressed exploration schedule and short budget prevent a fair comparison with the 300k MAP above; see the [short-run report](docs/gru_quick_reference/README.md).
 
 ## Installation
 
