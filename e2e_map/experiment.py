@@ -222,8 +222,7 @@ def train(args):
                 updates += 1
                 if updates % args.target_every == 0:
                     target.load_state_dict(model.state_dict())
-                    if hasattr(runner, 'invalidate_target'):
-                        runner.invalidate_target()
+                    runner.invalidate_target()
             loss_value = float(loss.detach())
         schedule.capture(completed, checkpoint)
         stopping = args.stop_after_updates and attempts - start_attempts >= args.stop_after_updates

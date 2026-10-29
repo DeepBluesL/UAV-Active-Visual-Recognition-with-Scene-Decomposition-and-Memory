@@ -53,10 +53,9 @@ class E2EModel(nn.Module):
 
     def train(self, mode=True):
         super().train(mode)
-        if hasattr(self, 'encoder'):
-            for layer in self.encoder.modules():
-                if isinstance(layer, nn.modules.batchnorm._BatchNorm):
-                    layer.eval()
+        for layer in self.encoder.modules():
+            if isinstance(layer, nn.modules.batchnorm._BatchNorm):
+                layer.eval()
         return self
 
     def _encode_chunk(self, images):

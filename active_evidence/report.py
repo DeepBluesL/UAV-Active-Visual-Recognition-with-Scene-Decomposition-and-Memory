@@ -92,10 +92,13 @@ def portable(value):
     return value
 
 def build(out=OUT,docs=DOCS):
-    results,selection,verification=load_ready(out); rows=results['rows']; docs.mkdir(parents=True,exist_ok=True)
+    results,selection,verification=load_ready(out); docs.mkdir(parents=True,exist_ok=True)
+    rows=[r for r in results['rows'] if r['scene']=='all']
+    indexed=index_rows(rows)
     make_plots(rows,docs)
     summaries={}
     for split in ('simple','hard'):
+        seeds=sorted({r['seed'] for r in rows if r['split']==split})
         summaries[split]={}
         for ctrl,readout in PAIRS:
             summaries[split][f'{ctrl}/{readout}']={}
@@ -108,9 +111,9 @@ def build(out=OUT,docs=DOCS):
             effects[ctrl]={}
             for b in (0,10,20,40,60):
                 diffs=[]
-                for seed in sorted({r['seed'] for r in rows if r['split']==split}):
-                    f=next((r for r in rows if r['seed']==seed and r['split']==split and r['scene']=='all' and r['controller']==ctrl and r['budget_m']==b and r['readout']=='final'),None)
-                    g=next((r for r in rows if r['seed']==seed and r['split']==split and r['scene']=='all' and r['controller']==ctrl and r['budget_m']==b and r['readout']=='gate'),None)
+                for seed in seeds:
+                    f=indexed.get((seed,split,'all',ctrl,b,'final'))
+                    g=indexed.get((seed,split,'all',ctrl,b,'gate'))
                     if f and g:diffs.append(g['accuracy']-f['accuracy'])
                 if diffs: effects[ctrl][str(b)]=ci(diffs)
         summaries[split]['paired_gate_minus_final']=effects

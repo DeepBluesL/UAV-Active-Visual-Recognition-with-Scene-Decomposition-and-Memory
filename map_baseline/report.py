@@ -222,13 +222,9 @@ def render_report(result_path: str | Path, out_dir: str | Path) -> dict[str, Pat
     """Write report.html and comparison.png from a result JSON file."""
     result_path, out_dir = Path(result_path), Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        with result_path.open("r", encoding="utf-8") as file:
-            result = json.load(file)
-    except (OSError, json.JSONDecodeError):
-        result = {}
+    result = json.loads(result_path.read_text(encoding="utf-8"))
     if not isinstance(result, dict):
-        result = {}
+        raise ValueError(f"Results JSON must contain an object: {result_path}")
 
     metrics = result.get("metrics") if isinstance(result.get("metrics"), list) else []
     hard_native = [m for m in metrics if isinstance(m, dict)
