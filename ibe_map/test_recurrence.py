@@ -135,7 +135,7 @@ class RecurrenceTests(unittest.TestCase):
 
     def test_sam_only_architecture_matches_original_map(self):
         self.assertIsInstance(make_model('sam_map'), MAPNetwork)
-        self.assertFalse(getattr(make_model('sam_map'), 'recurrent', False))
+        self.assertFalse(make_model('sam_map').recurrent)
         self.assertEqual(list(make_model('map').state_dict()), list(make_model('sam_map').state_dict()))
 
     def test_cache_comparison_rejects_classifier_or_order_changes(self):

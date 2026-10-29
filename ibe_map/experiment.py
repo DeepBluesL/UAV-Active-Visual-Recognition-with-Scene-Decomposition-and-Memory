@@ -72,7 +72,7 @@ class SequenceRunner:
         rows = torch.arange(len(histories), device=self.device)
         previous = torch.as_tensor(lengths - 2, dtype=torch.long, device=self.device)
         following = previous + 1
-        if getattr(model, 'recurrent', False):
+        if model.recurrent:
             q, ids = self.sequence_q(model, histories, lengths)
             return q[rows, previous], q[rows, following], ids[rows, following]
         ids = torch.as_tensor(histories, dtype=torch.long, device=self.device)
@@ -89,7 +89,7 @@ class SequenceRunner:
             n = lengths[start:start + 512]
             rows = torch.arange(len(h), device=self.device)
             positions = torch.as_tensor(n - 1, dtype=torch.long, device=self.device)
-            if getattr(model, 'recurrent', False):
+            if model.recurrent:
                 all_q, all_ids = self.sequence_q(model, h, n)
                 q, ids = all_q[rows, positions], all_ids[rows, positions]
             else:
@@ -232,9 +232,9 @@ def train(args):
         'target_update_every': args.target_every, 'epsilon': {'start': 1., 'final': .05, 'linear_decay_fraction': .7},
         'double_dqn': True, 'loss': 'smooth_l1', 'gradient_clip_norm': 10.,
         'encoder': 'frozen ImageNet ResNet50 V1',
-        'network': 'image512+bbox32=g544; GRU hidden544; state512; V1+direction7+range4' if getattr(model, 'recurrent', False)
+        'network': 'image512+bbox32=g544; GRU hidden544; state512; V1+direction7+range4' if model.recurrent
                    else 'image512+bbox32=g544; state512; V1+direction7+range4 (same MAP architecture)',
-        'recurrent': bool(getattr(model, 'recurrent', False)),
+        'recurrent': model.recurrent,
         'replay': 'uniform transitions, each with full episode prefix; zero hidden and independent online/target unroll',
         'acting_hidden': 'recomputed from full causal prefix after each optimizer update; reset at episode start',
         'padding_loss': 'one current-transition loss per sampled prefix; no loss on padding',

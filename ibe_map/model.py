@@ -29,14 +29,7 @@ class MemoMAPNetwork(MAPNetwork):
         g = torch.cat((image, box), dim=1).reshape(batch, steps, 544)
         history, hidden = self.gru(g, hidden)
         state = self.state(history.reshape(-1, 544))
-        value = self.value(state)
-        direction = self.direction(state)
-        distance = self.distance(state)
-        direction = direction - direction.mean(1, keepdim=True)
-        distance = distance - distance.mean(1, keepdim=True)
-        moves = (value[:, :, None] + direction[:, :6, None] + distance[:, None, :]).flatten(1)
-        stop = value + direction[:, 6:7]
-        return torch.cat((moves, stop), dim=1).reshape(batch, steps, 25), hidden
+        return self._action_values(state).reshape(batch, steps, 25), hidden
 
     def forward(self, features, boxes, hidden=None):
         """Single online observation, returning Q and the next hidden state."""

@@ -29,7 +29,7 @@ class E2EModel(nn.Module):
             raise ValueError('encoder_precision must be float16 or bfloat16; use amp=False for FP32')
         # Preserve the existing policy-head initialization for a given seed.
         self.head = make_model(variant)
-        self.recurrent = bool(getattr(self.head, 'recurrent', False))
+        self.recurrent = self.head.recurrent
         self.variant = variant
         self.microbatch = int(microbatch)
         self.checkpoint_encoder = bool(checkpoint_encoder)

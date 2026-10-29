@@ -14,7 +14,7 @@ import numpy as np
 import torch
 from map_baseline.environment import CLASSES, GRID, HARD, SIMPLE, TRAIN, STOP, Dataset, Protocol, save_manifest
 from map_baseline.experiment import aggregate, make_example
-from ibe_map.experiment import SequenceRunner, rollout, validate_cache_for_variant, verify_shared_observations, LEARNED
+from ibe_map.experiment import SequenceRunner, rollout, validate_cache_for_variant, verify_shared_observations
 from .images import RGBImageStore
 from .model import E2EModel, E2ERunner
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,8 +31,7 @@ def evaluate(args):
     policy = config['variant']
     if checkpoint['completed_episodes'] < config['requested_episodes'] or config['phase'] != 'full':
         raise ValueError('Only completed final full-TRAIN checkpoints can be formally evaluated')
-    args.seed = config['seed']
-    args.policies = [policy]
+    seed = config['seed']
     selected = {name: group for name, group in {'train': TRAIN, 'simple': SIMPLE, 'hard': HARD}.items()
                 if name in args.splits}
     scenes = sorted(set(scene for group in selected.values() for scene in group))
@@ -62,9 +61,6 @@ def evaluate(args):
         raise ValueError('Final encoder produced non-finite evaluation features')
     # Only this immutable final encoder is cached; the policy head is unchanged.
     runner = SequenceRunner(data, args.device)
-    runners = {policy: runner}
-    models = {policy: model.head}
-    checkpoints = {policy: checkpoint}
     training = {policy: json.loads((args.checkpoint.parent / 'training.json').read_text(encoding='utf8'))}
     checkpoint_hashes = {policy: hashlib.sha256(args.checkpoint.read_bytes()).hexdigest()}
     args.out.mkdir(parents=True, exist_ok=True)
@@ -79,58 +75,52 @@ def evaluate(args):
         for split, group in selected.items():
             starts = raw.indices(group)
             for mode in (['native', 'fixed_moves'] if split == 'hard' else ['native']):
-                policies = [p for p in args.policies if mode == 'native' or p != 'stationary']
-                for policy in policies:
-                    runner = runners[policy]
-                    result = rollout(runner, models.get(policy), starts, policy, protocol, args.seed, mode)
-                    summary = {'split': split if mode == 'native' else 'hard_fixed_3_moves',
-                               'policy': policy, **aggregate(result)}
-                    per_scene = []
-                    for scene in group:
-                        mask = starts // 605 == raw.scene_to_slot[scene]
-                        per_scene.append([float(result['correct'][mask].mean()), float(result['returns'][mask].mean())])
-                    values = np.array(per_scene)
-                    bootstrap_rng = np.random.default_rng(1729)
-                    sampled = values[bootstrap_rng.integers(len(values), size=(2000, len(values)))].mean(1)
-                    summary['accuracy_scene_bootstrap_95ci'] = np.quantile(sampled[:, 0], [.025, .975]).tolist()
-                    summary['return_scene_bootstrap_95ci'] = np.quantile(sampled[:, 1], [.025, .975]).tolist()
-                    metrics.append(summary)
-                    print(json.dumps(summary), flush=True)
-                    for row, idx in enumerate(starts):
-                        scene = raw.scenes[idx // 605]
-                        count = int(result['decisions'][row])
-                        taken = result['actions'][row, :count].tolist()
-                        reason = 'policy_stop' if taken[-1] == STOP else 'max_decisions_after_move'
-                        if taken[-1] == STOP and mode == 'fixed_moves':
-                            reason = 'fixed_movement_budget'
-                        elif taken[-1] == STOP and policy in ('sweep', 'random'):
-                            reason = 'confidence_threshold'
-                        final = int(result['final'][row])
-                        record = {'split': split, 'mode': mode, 'policy': policy, 'scene': scene,
-                            'start_x': int(GRID[idx % 605, 0]), 'start_y': int(GRID[idx % 605, 1]),
-                            'start_z': int(GRID[idx % 605, 2]), 'initial_correct': bool(result['initial_correct'][row]),
-                            'final_correct': bool(result['correct'][row]), 'return': float(result['returns'][row]),
-                            'distance_m': float(result['distance'][row]), 'decisions': count, 'stop_reason': reason,
-                            'final_confidence': float(raw.confidence[final]), 'success': bool(result['success'][row])}
-                        writer.writerow(record)
-                        observed = result['observations'][row, :count + 1]
-                        trace.write(json.dumps({**record, 'positions': GRID[observed % 605].tolist(), 'actions': taken,
-                            'rewards': result['rewards'][row, :count].tolist(),
-                            'predictions': [CLASSES[int(raw.predicted[i])] if raw.visible[i] else 'Unknown' for i in observed],
-                            'probabilities': raw.probs[observed].tolist()}, separators=(',', ':')) + '\n')
-                    if split == 'hard' and mode == 'native' and policy in LEARNED:
-                        for rows, note in [
-                            (np.flatnonzero(~result['initial_correct'] & result['correct']),
-                             'Post-selected wrong-to-correct illustration; aggregate metrics include all starting views.'),
-                            (np.flatnonzero(result['initial_correct'] & ~result['correct']),
-                             'Post-selected failure: a correct initial view became incorrect.')]:
-                            if len(rows):
-                                examples.append(make_example(raw, result, int(rows[0]), policy, args.data, note))
-    native = {(m['split'], m['policy']): m for m in metrics}
+                result = rollout(runner, model.head, starts, policy, protocol, seed, mode)
+                summary = {'split': split if mode == 'native' else 'hard_fixed_3_moves',
+                           'policy': policy, **aggregate(result)}
+                per_scene = []
+                for scene in group:
+                    mask = starts // 605 == raw.scene_to_slot[scene]
+                    per_scene.append([float(result['correct'][mask].mean()), float(result['returns'][mask].mean())])
+                values = np.array(per_scene)
+                bootstrap_rng = np.random.default_rng(1729)
+                sampled = values[bootstrap_rng.integers(len(values), size=(2000, len(values)))].mean(1)
+                summary['accuracy_scene_bootstrap_95ci'] = np.quantile(sampled[:, 0], [.025, .975]).tolist()
+                summary['return_scene_bootstrap_95ci'] = np.quantile(sampled[:, 1], [.025, .975]).tolist()
+                metrics.append(summary)
+                print(json.dumps(summary), flush=True)
+                for row, idx in enumerate(starts):
+                    scene = raw.scenes[idx // 605]
+                    count = int(result['decisions'][row])
+                    taken = result['actions'][row, :count].tolist()
+                    reason = 'policy_stop' if taken[-1] == STOP else 'max_decisions_after_move'
+                    if taken[-1] == STOP and mode == 'fixed_moves':
+                        reason = 'fixed_movement_budget'
+                    final = int(result['final'][row])
+                    record = {'split': split, 'mode': mode, 'policy': policy, 'scene': scene,
+                        'start_x': int(GRID[idx % 605, 0]), 'start_y': int(GRID[idx % 605, 1]),
+                        'start_z': int(GRID[idx % 605, 2]), 'initial_correct': bool(result['initial_correct'][row]),
+                        'final_correct': bool(result['correct'][row]), 'return': float(result['returns'][row]),
+                        'distance_m': float(result['distance'][row]), 'decisions': count, 'stop_reason': reason,
+                        'final_confidence': float(raw.confidence[final]), 'success': bool(result['success'][row])}
+                    writer.writerow(record)
+                    observed = result['observations'][row, :count + 1]
+                    trace.write(json.dumps({**record, 'positions': GRID[observed % 605].tolist(), 'actions': taken,
+                        'rewards': result['rewards'][row, :count].tolist(),
+                        'predictions': [CLASSES[int(raw.predicted[i])] if raw.visible[i] else 'Unknown' for i in observed],
+                        'probabilities': raw.probs[observed].tolist()}, separators=(',', ':')) + '\n')
+                if split == 'hard' and mode == 'native':
+                    for rows, note in [
+                        (np.flatnonzero(~result['initial_correct'] & result['correct']),
+                         'Post-selected wrong-to-correct illustration; aggregate metrics include all starting views.'),
+                        (np.flatnonzero(result['initial_correct'] & ~result['correct']),
+                         'Post-selected failure: a correct initial view became incorrect.')]:
+                        if len(rows):
+                            examples.append(make_example(raw, result, int(rows[0]), policy, args.data, note))
+    native = {m['split']: m for m in metrics}
     if 'train' in selected and 'hard' in selected:
-        for policy in args.policies:
-            native[('hard', policy)]['generalization_gap_return'] = (
-                native[('train', policy)]['return_mean'] - native[('hard', policy)]['return_mean'])
+        native['hard']['generalization_gap_return'] = (
+            native['train']['return_mean'] - native['hard']['return_mean'])
     result = {'protocol': {**protocol.as_dict(),
         'initial_positions': 'all 605 viewpoints per scene, identical across policies',
         'action_space': 'six directions x ranges1..4 plus STOP; 10m per unit; identical boundary masks',
@@ -138,7 +128,7 @@ def evaluate(args):
         'native_stopping': 'learned policies predict STOP; sweep/random retain original 0.90 confidence threshold',
         'fixed_moves_diagnostic': 'exactly three movements then STOP; controls count, not traveled meters',
         'decision_timing': 'move then recognize/reward; fifth decision may move; at most six observations',
-        'evaluation_seed': args.seed, 'checkpoint_sha256': checkpoint_hashes,
+        'evaluation_seed': seed, 'checkpoint_sha256': checkpoint_hashes,
         'evaluation_splits': list(selected),
         'raw_cache_fingerprint': raw.fingerprint, 'sam_cache_fingerprint': sam.fingerprint if sam else None,
         'raw_observation_signature': raw.observation_signature,
@@ -166,7 +156,7 @@ def evaluate(args):
     result_path.write_text(json.dumps(result, indent=2), encoding='utf8')
     if examples:
         sequence = {'method': 'MAP / Memo-MAP / SAM-MAP / IBE-MAP comparison', 'limitations': result['limitations'],
-                    'classes': CLASSES, 'metrics': native.get(('hard', 'ibe_map'), {}), 'episodes': examples}
+                    'classes': CLASSES, 'metrics': native['hard'], 'episodes': examples}
         (args.out / 'examples.json').write_text(json.dumps(sequence, indent=2), encoding='utf8')
         render(args.out / 'examples.json', args.out / 'examples')
     print(f'Results: {result_path.resolve()}', flush=True)

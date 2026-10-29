@@ -4,6 +4,8 @@ from torch import nn
 
 
 class MAPNetwork(nn.Module):
+    recurrent = False
+
     def __init__(self):
         super().__init__()
         self.image = nn.Sequential(nn.LayerNorm(2048),nn.Linear(2048,512),nn.ReLU())
@@ -15,6 +17,9 @@ class MAPNetwork(nn.Module):
 
     def forward(self, features, boxes):
         state=self.state(torch.cat((self.image(features.float()),self.box(boxes.float()/256.0)),dim=1))
+        return self._action_values(state)
+
+    def _action_values(self, state):
         v=self.value(state)
         direction=self.direction(state)
         distance=self.distance(state)
